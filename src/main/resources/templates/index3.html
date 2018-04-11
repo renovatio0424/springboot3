@@ -35,21 +35,8 @@
     </style>
 </head>
 <body>
-<h1 th:text="#{content.title}">Hello Page</h1>
-<p th:text="${msg}">message.</p>
-<table th:object="${object}">
-    <tr>
-        <th>ID</th>
-        <td th:text="*{id}"></td>
-    </tr>
-    <tr>
-        <th>NAME</th>
-        <td th:text="*{name}"></td>
-    </tr>
-    <tr>
-        <th>MAIL</th>
-        <td th:text="*{value}"></td>
-    </tr>
-</table>
+    <h1 th:text="#{content.title}">Hello page</h1>
+    <p th:if="${check}" th:text="${id} + ' is ' + ${trueVal}">message.</p>
+    <p th:unless="${check}" th:text="${id} + ' is ' + ${falseVal}">message.</p>
 </body>
 </html>

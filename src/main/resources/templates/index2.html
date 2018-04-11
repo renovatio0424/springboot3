@@ -35,21 +35,9 @@
     </style>
 </head>
 <body>
-<h1 th:text="#{content.title}">Hello Page</h1>
-<p th:text="${msg}">message.</p>
-<table th:object="${object}">
-    <tr>
-        <th>ID</th>
-        <td th:text="*{id}"></td>
-    </tr>
-    <tr>
-        <th>NAME</th>
-        <td th:text="*{name}"></td>
-    </tr>
-    <tr>
-        <th>MAIL</th>
-        <td th:text="*{value}"></td>
-    </tr>
-</table>
+    <h1 th:text="#{content.title}">Hello Page</h1>
+    <div th:object="${object}">
+        <p th:text="|my name is *{name}. mail address is *{value}.|">message.</p>
+    </div>
 </body>
 </html>

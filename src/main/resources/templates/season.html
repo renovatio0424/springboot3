@@ -35,21 +35,14 @@
     </style>
 </head>
 <body>
-<h1 th:text="#{content.title}">Hello Page</h1>
-<p th:text="${msg}">message.</p>
-<table th:object="${object}">
-    <tr>
-        <th>ID</th>
-        <td th:text="*{id}"></td>
-    </tr>
-    <tr>
-        <th>NAME</th>
-        <td th:text="*{name}"></td>
-    </tr>
-    <tr>
-        <th>MAIL</th>
-        <td th:text="*{value}"></td>
-    </tr>
-</table>
+    <h1 th:text="#{content.title}">Hello Page</h1>
+    <div th:switch="${check}">
+        <p th:case="0" th:text="|${month} - Winter|"></p>
+        <p th:case="1" th:text="|${month} - Spring|"></p>
+        <p th:case="2" th:text="|${month} - Summer|"></p>
+        <p th:case="3" th:text="|${month} - Autumn|"></p>
+        <p th:case="4" th:text="|${month} - Winter|"></p>
+        <p th:case="*">...?</p>
+    </div>
 </body>
 </html>

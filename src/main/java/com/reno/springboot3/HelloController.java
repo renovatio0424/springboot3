@@ -1,39 +1,165 @@
 package com.reno.springboot3;
 
+import com.reno.springboot3.repositories.MyData;
+import com.reno.springboot3.repositories.MyDataDaoImpl;
 import com.reno.springboot3.repositories.MyDataRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class HelloController {
+    @PostConstruct
+    public void init(){
+        dataDao = new MyDataDaoImpl(entityManager);
+        MyData myData = new MyData();
+        myData.setName("kim");
+        myData.setAge(123);
+        myData.setMail("kim@gilbut.co.kr");
+        myData.setMemo("0909999999");
+        repository.save(myData);
+
+        MyData myData1 = new MyData();
+        myData1.setName("lee");
+        myData1.setAge(15);
+        myData1.setMail("klee@flower");
+        myData1.setMemo("0808888888");
+        repository.save(myData1);
+
+        MyData myData2 = new MyData();
+        myData2.setName("choi");
+        myData2.setAge(37);
+        myData2.setMail("choi@happy");
+        myData2.setMemo("0707777777");
+        repository.save(myData2);
+    }
+
     @Autowired
     MyDataRepository repository;
 
-    @RequestMapping("/repository")
-    public ModelAndView showAllitems(ModelAndView modelAndView){
-        modelAndView.setViewName("repository");
-        Iterable<MyData> list = repository.findAll();
-        modelAndView.addObject("data",list);
+    @PersistenceContext
+    EntityManager entityManager;
+
+    MyDataDaoImpl dataDao;
+
+//    @RequestMapping("/repository")
+//    public ModelAndView showAllitems(ModelAndView modelAndView){
+//        modelAndView.setViewName("repository");
+//        Iterable<MyData> list = repository.findAll();
+//        modelAndView.addObject("data",list);
+//        return modelAndView;
+//    }
+
+    @RequestMapping(value = "/repository", method = RequestMethod.GET)
+    public ModelAndView getAllitems(@ModelAttribute("formModel") MyData myData, ModelAndView modelAndView){
+        modelAndView.setViewName("repository_index");
+        modelAndView.addObject("msg","MyData 예제입니다");
+        Iterable<MyData> list = dataDao.getAll();
+        modelAndView.addObject("datalist",list);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/repository", method = RequestMethod.POST)
+    @Transactional(readOnly = false)
+    public ModelAndView formItem(@ModelAttribute("formModel") @Validated MyData myData,
+                                 BindingResult result,
+                                 ModelAndView modelAndView){
+        ModelAndView res = null;
+        if(!result.hasErrors()){
+            repository.saveAndFlush(myData);
+            res = new ModelAndView("redirect:/repository");
+        } else {
+            modelAndView.setViewName("repository_index");
+            modelAndView.addObject("msg", "sorry, error is occurred...");
+            Iterable<MyData> list = repository.findAll();
+            modelAndView.addObject("datalist",list);
+            res = modelAndView;
+        }
+        return res;
+    }
+
+
+    @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+    public ModelAndView edit(@ModelAttribute MyData myData, @PathVariable int id, ModelAndView modelAndView){
+        modelAndView.setViewName("edit");
+        modelAndView.addObject("title","edit mydata.");
+        MyData data = repository.findByid((long) id);
+        modelAndView.addObject("formModel", data);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/edit", method = RequestMethod.POST)
+    @Transactional(readOnly = false)
+    public ModelAndView update(@ModelAttribute MyData myData, ModelAndView modelAndView){
+        repository.saveAndFlush(myData);
+        return new ModelAndView("redirect:/repository");
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+    public ModelAndView delete(@PathVariable int id, ModelAndView modelAndView){
+        modelAndView.setViewName("delete");
+        modelAndView.addObject("title","delete mydata.");
+        MyData data = repository.findByid((long) id);
+        modelAndView.addObject("formModel",data);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @Transactional(readOnly = false)
+    public ModelAndView remove(@RequestParam long id, ModelAndView modelAndView){
+        repository.deleteById(id);
+        return new ModelAndView("redirect:/repository");
+    }
+
+    @RequestMapping(value = "/find", method = RequestMethod.GET)
+    public ModelAndView find(ModelAndView modelAndView){
+        modelAndView.setViewName("find");
+        modelAndView.addObject("title", "Find Page");
+        modelAndView.addObject("msg", "MyData의 예제입니다");
+        modelAndView.addObject("value","");
+        Iterable<MyData> list = dataDao.getAll();
+        modelAndView.addObject("datalist", list);
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/find", method = RequestMethod.POST)
+    public ModelAndView search(HttpServletRequest reqeRequest, ModelAndView modelAndView){
+        modelAndView.setViewName("find");
+        String param = reqeRequest.getParameter("fstr");
+
+        if(param == "")
+            modelAndView = new ModelAndView("redirect:/find");
+        else {
+            modelAndView.addObject("title", "Find result");
+            modelAndView.addObject("msg", "[" + param + "] 의 검색 결과");
+            modelAndView.addObject("value", param);
+            List<MyData> list = dataDao.find(param);
+            modelAndView.addObject("datalist",list);
+        }
+
         return modelAndView;
     }
 
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView index(ModelAndView modelAndView){
-        modelAndView.setViewName("index2");
-        modelAndView.addObject("msg","current data.");
-        DataObject object = new DataObject(123,"lee","lee@flower.com");
-        modelAndView.addObject("object",object);
+        modelAndView.setViewName("index");
+        modelAndView.addObject("title","Find Page");
+        Iterable<MyData> list = dataDao.findByAge(10,40);
+        modelAndView.addObject("datalist",list);
         return modelAndView;
     }
 

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http:www.thymeleaf.org"/>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>top page</title>
+    <title>find page</title>
     <meta http-equiv="content-type"
           content="text/html; charset=UTF-8"/>
     <style>
         h1 {
             font-size: 18pt;
             font-weight: bold;
-            color: gray
+            color: gray;
         }
 
         body {
@@ -32,30 +32,35 @@
             color: black;
             background: #e0e0ff;
         }
-
-        .err {
-            color: red;
-        }
     </style>
 </head>
 <body>
-<h1 th:text="#{content.title}">Hello Page</h1>
+<h1 th:text="${title}">find page</h1>
 <p th:text="${msg}"></p>
-<table th:object="${object}">
+<table>
+    <form action="/find" method="post">
+        <tr>
+            <td>FIND:</td>
+            <td><input type="text" name="fstr" size="20" th:value="${value}"/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <input type="submit"/></tr>
+    </form>
+</table>
+<ht/>
+<table>
     <tr>
         <th>ID</th>
         <th>이름</th>
         <th>메일</th>
         <th>연령</th>
-        <th>메모(tel)</th>
     </tr>
-
     <tr th:each="obj : ${datalist}">
         <td th:text="${obj.id}"></td>
         <td th:text="${obj.name}"></td>
         <td th:text="${obj.mail}"></td>
         <td th:text="${obj.age}"></td>
-        <td th:text="${obj.memo}"></td>
     </tr>
 </table>
 </body>

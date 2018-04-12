@@ -32,31 +32,29 @@
             color: black;
             background: #e0e0ff;
         }
-
-        .err {
-            color: red;
-        }
     </style>
 </head>
 <body>
-<h1 th:text="#{content.title}">Hello Page</h1>
-<p th:text="${msg}"></p>
-<table th:object="${object}">
-    <tr>
-        <th>ID</th>
-        <th>이름</th>
-        <th>메일</th>
-        <th>연령</th>
-        <th>메모(tel)</th>
-    </tr>
-
-    <tr th:each="obj : ${datalist}">
-        <td th:text="${obj.id}"></td>
-        <td th:text="${obj.name}"></td>
-        <td th:text="${obj.mail}"></td>
-        <td th:text="${obj.age}"></td>
-        <td th:text="${obj.memo}"></td>
-    </tr>
+<h1 th:text="${title}">Edit page</h1>
+<table>
+    <form method="post" action="/delete" th:object="${formModel}">
+        <input type="hidden" name="id" th:value="*{id}"/>
+        <tr>
+            <td><p th:text="|이름: *{name}|">이름</p></td>
+        </tr>
+        <tr>
+            <td><p th:text="|연령: *{age}|">연령</p></td>
+        </tr>
+        <tr>
+            <td><p th:text="|*{mail}|"></p></td>
+        </tr>
+        <tr>
+            <td><p th:text="|*{memo}|"></p></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="delete"/></td>
+        </tr>
+    </form>
 </table>
 </body>
 </html>
